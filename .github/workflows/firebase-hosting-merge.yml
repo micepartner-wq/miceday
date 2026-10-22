@@ -17,7 +17,7 @@ jobs:
       FIREBASE_PROJECT_ID: human-partner
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -33,7 +33,7 @@ jobs:
       FIREBASE_PROJECT_ID: human-partner
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
