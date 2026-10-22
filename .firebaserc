@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "human-partner",
+    "miceday": "human-partner"
+  },
+  "targets": {
+    "human-partner": {
+      "hosting": {
+        "miceday": [
+          "human-partner"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

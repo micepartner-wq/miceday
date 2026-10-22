@@ -1,0 +1,65 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Container } from '../components/ui/Container';
+import { Home, ArrowLeft } from 'lucide-react';
+import { Seo } from '../components/seo/Seo';
+import { NOINDEX_ROBOTS } from '../src/seo';
+
+export const NotFound: React.FC = () => {
+    return (
+        <div className="min-h-[70vh] flex items-center justify-center py-20 px-4">
+            <Seo
+                title="페이지를 찾을 수 없습니다 | 행사어때"
+                description="요청하신 페이지를 찾을 수 없습니다."
+                canonical="/404"
+                robots={NOINDEX_ROBOTS}
+            />
+            
+            <Container>
+                <div className="max-w-md mx-auto text-center">
+                    {/* Error Symbol */}
+                    <div className="mb-8 relative inline-block">
+                        <div className="w-24 h-24 bg-green-50 rounded-lg flex items-center justify-center animate-pulse">
+                            <span className="text-4xl font-black text-[#39B54A]">404</span>
+                        </div>
+                        <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center border border-green-100">
+                            <div className="w-6 h-6 bg-[#39B54A] rounded-full animate-bounce"></div>
+                        </div>
+                    </div>
+
+                    <h1 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">
+                        원하시는 페이지를<br />찾을 수 없습니다.
+                    </h1>
+                    
+                    <p className="text-slate-500 mb-10 leading-relaxed break-keep">
+                        입력하신 주소가 정확한지 다시 한번 확인해 주세요.<br />
+                        페이지가 삭제되었거나 주소가 변경되었을 수 있습니다.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Link 
+                            to="/" 
+                            className="flex items-center justify-center gap-2 px-8 py-4 bg-[#39B54A] text-white font-bold rounded-lg shadow-lg shadow-[#39B54A]/20 hover:bg-[#2F9A3F] transition-all transform hover:-translate-y-1"
+                        >
+                            <Home size={18} />
+                            홈으로 돌아가기
+                        </Link>
+                        <button 
+                            onClick={() => window.history.back()}
+                            className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-700 font-bold rounded-lg border border-slate-200 hover:bg-slate-50 transition-all transition-all transform hover:-translate-y-1"
+                        >
+                            <ArrowLeft size={18} />
+                            이전 페이지로
+                        </button>
+                    </div>
+
+                    <div className="mt-16 pt-8 border-t border-slate-100">
+                        <p className="text-xs text-slate-400">
+                            도움이 필요하신가요? <Link to="/cs" className="text-[#39B54A] underline font-medium">고객센터</Link>로 문의해 주세요.
+                        </p>
+                    </div>
+                </div>
+            </Container>
+        </div>
+    );
+};

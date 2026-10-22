@@ -1,0 +1,33 @@
+# ═══════════════════════════════════════
+# 행사어때 robots.txt
+# ═══════════════════════════════════════
+
+User-agent: *
+Allow: /
+Allow: /service/
+Allow: /products
+
+Allow: /cases
+Allow: /notices
+Allow: /cs
+
+# 비공개/관리자 영역
+Disallow: /admin/
+Disallow: /mypage/
+Disallow: /login
+Disallow: /signup
+Disallow: /search
+Disallow: /blank
+Disallow: /event
+Disallow: /p/
+
+# 네이버 봇 크롤링 허용
+User-agent: Yeti
+Allow: /
+Crawl-delay: 1
+
+# 구글 봇 이미지 크롤링
+User-agent: Googlebot-Image
+Allow: /
+
+Sitemap: https://miceday.co.kr/sitemap.xml

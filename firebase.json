@@ -1,0 +1,77 @@
+{
+    "functions": [
+        {
+            "source": "functions",
+            "codebase": "default",
+            "ignore": [
+                "node_modules",
+                ".git",
+                "firebase-debug.log",
+                "firebase-debug.*.log"
+            ],
+            "predeploy": [
+                "npm --prefix \"$RESOURCE_DIR\" run build"
+            ]
+        }
+    ],
+    "hosting": {
+        "target": "miceday",
+        "public": "dist",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "headers": [
+            {
+                "source": "**/*.@(eot|otf|ttf|ttc|woff|font.css|jpg|jpeg|gif|png|svg|webp|js|css)",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "public, max-age=31536000"
+                    }
+                ]
+            },
+            {
+                "source": "**/*.html",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "no-cache, no-store, must-revalidate"
+                    }
+                ]
+            },
+            {
+                "regex": "^/products(?:/.*)?/?$",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "public,max-age=0,must-revalidate"
+                    }
+                ]
+            }
+        ],
+        "rewrites": [
+            {
+                "source": "/api/email/booking-request",
+                "function": "sendBookingRequestNotification"
+            },
+            {
+                "source": "/api/email/verify",
+                "function": "sendEmailVerification"
+            },
+            {
+                "source": "/api/email/inquiry-notification",
+                "function": "sendInquiryNotification"
+            },
+            {
+                "source": "/sitemap.xml",
+                "function": "sitemapXml"
+            },
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ]
+    }
+}
