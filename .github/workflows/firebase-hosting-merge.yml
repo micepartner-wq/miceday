@@ -19,7 +19,19 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci --legacy-peer-deps
       - run: npm run build
+      - name: Check Firebase deployment credentials
+        id: firebase_credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HUMAN_PARTNER }}
+        run: |
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Firebase preview skipped: FIREBASE_SERVICE_ACCOUNT_HUMAN_PARTNER is not set."
+          fi
       - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: steps.firebase_credentials.outputs.available == 'true'
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_HUMAN_PARTNER }}"
@@ -35,7 +47,19 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci --legacy-peer-deps
       - run: npm run build
+      - name: Check Firebase deployment credentials
+        id: firebase_credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HUMAN_PARTNER }}
+        run: |
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Firebase live deployment skipped: FIREBASE_SERVICE_ACCOUNT_HUMAN_PARTNER is not set."
+          fi
       - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: steps.firebase_credentials.outputs.available == 'true'
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_HUMAN_PARTNER }}"
