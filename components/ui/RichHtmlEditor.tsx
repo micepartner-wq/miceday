@@ -308,6 +308,7 @@ export const RichHtmlEditor: React.FC<RichHtmlEditorProps> = ({
         ) : null}
         <div
           ref={contentRef}
+          data-case-editor={imageFolder === 'installation-cases' ? true : undefined}
           className={`prose prose-sm max-w-none p-4 outline-none [&_img]:max-w-full [&_img]:h-auto ${
             enableFeaturedImageSelect
               ? '[&_img[data-editor-featured="true"]]:outline [&_img[data-editor-featured="true"]]:outline-4 [&_img[data-editor-featured="true"]]:outline-[#39B54A]'

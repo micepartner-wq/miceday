@@ -5,6 +5,7 @@ import { Seo } from '../components/seo/Seo';
 import { Container } from '../components/ui/Container';
 import { RichHtmlEditor } from '../components/ui/RichHtmlEditor';
 import { CaseStoryGuide } from '../components/content/CaseStoryGuide';
+import { upsertCaseStory } from '../src/utils/caseStory';
 import {
   addInstallationCase,
   getAllInstallationCases,
@@ -259,7 +260,7 @@ export const InstallationCaseCreatePage: React.FC = () => {
 
                 <div>
                   <label className="mb-1.5 ml-1 block text-sm font-bold text-slate-700">본문</label>
-                  <CaseStoryGuide onApply={(html, summary) => setFormData(prev => ({ ...prev, content: `${prev.content}\n${html}`, summary: prev.summary || summary }))} />
+                  <CaseStoryGuide initialContent={formData.content} onApply={(html, summary) => setFormData(prev => ({ ...prev, content: upsertCaseStory(prev.content, html), summary: prev.summary || summary }))} />
                   <label htmlFor="case-summary" className="mb-2 block text-sm font-bold text-slate-700">목록에 표시할 한 줄 요약</label>
                   <input id="case-summary" maxLength={140} value={formData.summary} onChange={event => setFormData(prev => ({ ...prev, summary: event.target.value }))}
                     placeholder="행사 규모와 맡은 업무를 한 문장으로 정리해주세요."

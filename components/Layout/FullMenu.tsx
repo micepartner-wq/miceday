@@ -235,15 +235,6 @@ export const FullMenu: React.FC<FullMenuProps> = ({ onClose, variant = 'mobile',
                                     </div>
                                 </div>
 
-                                {/* MICE 회원사 */}
-                                <div className="border-b border-gray-50">
-                                    <div className="flex items-center gap-3 py-4">
-                                        <Link to="/alliance" onClick={onClose} className="flex-1 text-base font-bold text-slate-800 transition-colors hover:text-[#39B54A]">
-                                            MICE 회원사
-                                        </Link>
-                                    </div>
-                                </div>
-
                                 {/* 레퍼런스 */}
                                 <div className="border-b border-gray-50">
                                     <div className="flex items-center gap-3 py-4">

@@ -2,6 +2,7 @@ import React from 'react';
 import { Loader2, Save, Upload, X } from 'lucide-react';
 import { RichHtmlEditor } from '../ui/RichHtmlEditor';
 import { CaseStoryGuide } from './CaseStoryGuide';
+import { upsertCaseStory } from '../../src/utils/caseStory';
 import { uploadImage } from '../../src/api/storageApi';
 import type { InstallationCase, Notice } from '../../src/api/contentApi';
 import { normalizeContentCategoryName } from '../../src/api/contentApi';
@@ -313,7 +314,7 @@ export const ContentInlineEditor: React.FC<ContentInlineEditorProps> = ({
           </span>
         </div>
         {uploadFolder === 'installation-cases' && <>
-          <CaseStoryGuide onApply={(html, summary) => setFormData(prev => ({ ...prev, content: `${prev.content}\n${html}`, summary: prev.summary || summary }))} />
+          <CaseStoryGuide initialContent={formData.content || ''} onApply={(html, summary) => setFormData(prev => ({ ...prev, content: upsertCaseStory(prev.content || '', html), summary: prev.summary || summary }))} />
           <label htmlFor="inline-case-summary" className="mb-2 block text-sm font-bold text-slate-700">목록에 표시할 한 줄 요약</label>
           <input id="inline-case-summary" maxLength={140} value={formData.summary} onChange={event => setFormData(prev => ({ ...prev, summary: event.target.value }))}
             className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm" />

@@ -108,6 +108,11 @@ export const Login: React.FC = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                             />
+                            <div className="mt-2 text-right">
+                                <Link to="/forgot-password" state={{ email: formData.email }} className="text-sm font-medium text-[#39B54A] hover:underline">
+                                    비밀번호를 잊으셨나요?
+                                </Link>
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-between py-1 md:py-2">

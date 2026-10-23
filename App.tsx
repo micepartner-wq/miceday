@@ -6,6 +6,9 @@ import { AuthProvider } from './src/context/AuthContext';
 import { PublicContentProvider } from './src/context/PublicContentContext';
 import { AdminRoute } from './src/components/AdminRoute';
 
+const InstallPage = lazy(() =>
+  import('./pages/InstallPage').then((module) => ({ default: module.InstallPage }))
+);
 const MainPage = lazy(() =>
   import('./pages/MainPage').then((module) => ({ default: module.MainPage }))
 );
@@ -26,6 +29,9 @@ const InquiryPage = lazy(() =>
 );
 const Login = lazy(() =>
   import('./pages/Login').then((module) => ({ default: module.Login }))
+);
+const ForgotPassword = lazy(() =>
+  import('./pages/ForgotPassword').then((module) => ({ default: module.ForgotPassword }))
 );
 const SignUp = lazy(() =>
   import('./pages/SignUp').then((module) => ({ default: module.SignUp }))
@@ -183,6 +189,9 @@ function App() {
           <Route path="/admin/login" element={<LazyRoute component={AdminLogin} />} />
           <Route path="/admin/signup" element={<LazyRoute component={AdminSignup} />} />
 
+          {/* App install page - standalone (no header/footer) */}
+          <Route path="/install" element={<LazyRoute component={InstallPage} />} />
+
           {/* Public Routes */}
           <Route
             path="/*"
@@ -202,6 +211,7 @@ function App() {
                     <Route path="/mypage/info" element={<LazyRoute component={MyInfoPage} />} />
                     <Route path="/mypage/inquiry" element={<LazyRoute component={InquiryPage} />} />
                     <Route path="/login" element={<LazyRoute component={Login} />} />
+                    <Route path="/forgot-password" element={<LazyRoute component={ForgotPassword} />} />
                     <Route path="/signup" element={<LazyRoute component={SignUp} />} />
                     <Route path="/cs" element={<LazyRoute component={CSCenter} />} />
                     <Route path="/p/:code" element={<LazyRoute component={RedirectToProduct} />} />

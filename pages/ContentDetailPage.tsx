@@ -46,7 +46,7 @@ const splitTrailingPunctuation = (rawUrl: string) => {
   return { url, trailing };
 };
 
-const linkifyHtmlContent = (html: string) => {
+const linkifyHtmlContent = (html: string, featuredImageUrl?: string | null) => {
   if (!html?.trim() || typeof window === 'undefined' || typeof DOMParser === 'undefined') {
     return html;
   }
@@ -56,6 +56,20 @@ const linkifyHtmlContent = (html: string) => {
   const root = doc.body.firstElementChild;
 
   if (!root) return html;
+
+  if (featuredImageUrl) {
+    const featuredUrl = new URL(featuredImageUrl, window.location.href).href;
+    const duplicateImage = Array.from(root.querySelectorAll('img')).find(img =>
+      new URL(img.getAttribute('src') || '', window.location.href).href === featuredUrl
+    );
+    if (duplicateImage) {
+      const wrapper = duplicateImage.parentElement;
+      duplicateImage.remove();
+      if (wrapper && ['P', 'FIGURE'].includes(wrapper.tagName) && !wrapper.textContent?.trim() && !wrapper.querySelector('img, video, iframe, table')) {
+        wrapper.remove();
+      }
+    }
+  }
 
   const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const textNodes: Text[] = [];
@@ -137,7 +151,9 @@ export const ContentDetailPage: React.FC<ContentDetailPageProps> = ({
   contentBottom,
 }) => {
   const seoDescription = description?.trim() || `${title} 상세 페이지입니다.`;
-  const renderedContentHtml = contentHtml ? linkifyHtmlContent(contentHtml) : contentHtml;
+  const renderedContentHtml = contentHtml
+    ? linkifyHtmlContent(contentHtml, listPath === '/cases' ? imageUrl : undefined)
+    : contentHtml;
 
   return (
     <>

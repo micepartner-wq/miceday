@@ -118,6 +118,11 @@ export const AdminLogin: React.FC = () => {
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
                             </div>
+                            <div className="mt-2 text-right">
+                                <Link to="/forgot-password?from=admin" state={{ email }} className="text-sm font-medium text-[#39B54A] hover:underline">
+                                    비밀번호를 잊으셨나요?
+                                </Link>
+                            </div>
                         </div>
 
                         <button
