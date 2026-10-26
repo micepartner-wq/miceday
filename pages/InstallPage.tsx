@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const APK_URL = 'https://rentalpartner.kr/app/haengsaeottae.apk';
+const APK_URL = 'https://rentalpartner.kr/app/haengsaeottae.apk?v=1.2';
 
 const STEPS = [
   <>아래 <strong>"앱 다운로드"</strong> 버튼 누르기</>,
