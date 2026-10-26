@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import { AuthProvider } from './src/context/AuthContext';
@@ -12,6 +12,7 @@ const InstallPage = lazy(() =>
 const MainPage = lazy(() =>
   import('./pages/MainPage').then((module) => ({ default: module.MainPage }))
 );
+const BusinessPreviewPage = lazy(() => import('./pages/BusinessPreviewPage'));
 const ProductListPage = lazy(() =>
   import('./pages/ProductListPage').then((module) => ({ default: module.ProductListPage }))
 );
@@ -106,9 +107,7 @@ const SectionManager = lazy(() =>
 const CategoryManager = lazy(() =>
   import('./pages/admin/CategoryManager').then((module) => ({ default: module.CategoryManager }))
 );
-const CMSManager = lazy(() =>
-  import('./pages/admin/CMSManager').then((module) => ({ default: module.CMSManager }))
-);
+const ServiceOverviewManager = lazy(() => import('./pages/admin/ServiceOverviewManager'));
 const UserManager = lazy(() =>
   import('./pages/admin/UserManager').then((module) => ({ default: module.UserManager }))
 );
@@ -123,9 +122,6 @@ const NavMenuManager = lazy(() =>
 );
 const FAQManager = lazy(() =>
   import('./pages/admin/FAQManager').then((module) => ({ default: module.FAQManager }))
-);
-const InquiryManager = lazy(() =>
-  import('./pages/admin/InquiryManager').then((module) => ({ default: module.InquiryManager }))
 );
 const InstallationCaseManager = lazy(() =>
   import('./pages/admin/InstallationCaseManager').then((module) => ({ default: module.InstallationCaseManager }))
@@ -160,6 +156,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/preview/business" element={<LazyRoute component={BusinessPreviewPage} />} />
           {/* Admin Routes - Protected */}
           <Route
             path="/admin"
@@ -169,7 +166,8 @@ function App() {
               </AdminRoute>
             }
           >
-            <Route path="cms" element={<LazyRoute component={CMSManager} />} />
+            <Route path="cms" element={<Navigate to="/admin/service-overview" replace />} />
+            <Route path="service-overview" element={<LazyRoute component={ServiceOverviewManager} />} />
             <Route path="sections" element={<LazyRoute component={SectionManager} />} />
             <Route path="categories" element={<LazyRoute component={CategoryManager} />} />
             <Route path="products" element={<LazyRoute component={ProductManager} />} />
@@ -177,7 +175,7 @@ function App() {
             <Route path="users" element={<LazyRoute component={UserManager} />} />
             <Route path="menus" element={<LazyRoute component={NavMenuManager} />} />
             <Route path="faqs" element={<LazyRoute component={FAQManager} />} />
-            <Route path="inquiries" element={<LazyRoute component={InquiryManager} />} />
+            <Route path="inquiries" element={<Navigate to="/admin/bookings" replace />} />
             <Route path="cases" element={<LazyRoute component={InstallationCaseManager} />} />
             <Route path="notices" element={<LazyRoute component={NoticeManager} />} />
             <Route path="booking-email" element={<LazyRoute component={BookingEmailSettingsPage} />} />

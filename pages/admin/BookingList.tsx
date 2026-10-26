@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useInquiryDelivery, InquiryDeliveryBanner, InquiryDeliveryCell } from '../../components/admin/InquiryDelivery';
 import { Loader2, MessageSquare, Trash2, Send, CheckCircle, Clock, Building2, User, Mail, Calendar as CalendarIcon, Phone, Download, Paperclip, MonitorPlay, Layers, BatteryCharging, Coffee, Megaphone, Palette } from 'lucide-react';
 import { getInquiriesPage, answerInquiry, deleteInquiry, Inquiry } from '../../src/api/inquiryApi';
 
 export const BookingList = () => {
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+    const delivery = useInquiryDelivery(inquiries);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
@@ -219,7 +221,7 @@ export const BookingList = () => {
                 <div>
                     <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
                         <MessageSquare className="text-[#39B54A]" />
-                        스마트 견적 및 제휴 문의 관리
+                        전체 문의 관리
                     </h2>
                     <p className="text-slate-500 text-sm mt-1">총 {totalCount}건의 문의 내역</p>
                 </div>
@@ -245,6 +247,7 @@ export const BookingList = () => {
                 </div>
             </div>
 
+            <InquiryDeliveryBanner delivery={delivery} />
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[900px]">
@@ -256,14 +259,15 @@ export const BookingList = () => {
                                 <th className="text-left px-4 py-3 text-sm font-bold text-slate-600">담당자 (이메일)</th>
                                 <th className="text-left px-4 py-3 text-sm font-bold text-slate-600">접수일시</th>
                                 <th className="text-center px-4 py-3 text-sm font-bold text-slate-600">상태</th>
+                                <th className="text-left px-4 py-3 text-sm font-bold text-slate-600">메일 알림</th>
                                 <th className="text-center px-4 py-3 text-sm font-bold text-slate-600">작업</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {inquiries.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-16 text-slate-400">
-                                        등록된 견적/제휴 문의가 없습니다.
+                                    <td colSpan={8} className="text-center py-16 text-slate-400">
+                                        등록된 문의가 없습니다.
                                     </td>
                                 </tr>
                             ) : (
@@ -313,6 +317,7 @@ export const BookingList = () => {
                                             <td className="px-4 py-4 text-center">
                                                 {getStatusBadge(inquiry.status)}
                                             </td>
+                                            <td className="px-4 py-4"><InquiryDeliveryCell inquiry={inquiry} delivery={delivery} /></td>
                                             <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
                                                 <div className="flex items-center justify-center gap-1">
                                                     {deletingId === inquiry.id ? (
@@ -331,7 +336,7 @@ export const BookingList = () => {
                                         </tr>
                                         {expandedId === inquiry.id && (
                                             <tr className="bg-slate-50/80 border-b border-slate-200">
-                                                <td colSpan={7} className="px-6 py-6">
+                                                <td colSpan={8} className="px-6 py-6">
                                                     <div className="flex flex-col lg:flex-row gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
                                                         {/* Left: Original Content */}
                                                         <div className="flex-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">

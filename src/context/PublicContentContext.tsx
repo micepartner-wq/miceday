@@ -7,12 +7,8 @@ import {
   QuickMenuItem,
   TabMenuItem,
   getAllNavMenuItems,
-  getHeroBanners,
-  getPopups,
-  getQuickMenuItems,
-  getTabMenuItems,
 } from '../api/cmsApi';
-import { Section, getActiveSections } from '../api/sectionApi';
+import { Section } from '../api/sectionApi';
 
 interface PublicContentValue {
   activeSections: Section[];
@@ -146,55 +142,9 @@ const fetchShellContent = async (): Promise<PublicContentSnapshot> => {
   };
 };
 
-const fetchHomeContent = async (): Promise<PublicContentSnapshot> => {
-  const [
-    activeSectionsResult,
-    heroBannersResult,
-    navMenuItemsResult,
-    popupsResult,
-    quickMenuItemsResult,
-    tabMenuItemsResult,
-  ] = await Promise.allSettled([
-    getActiveSections(),
-    getHeroBanners(),
-    getAllNavMenuItems(),
-    getPopups(),
-    getQuickMenuItems(),
-    getTabMenuItems(),
-  ]);
-
-  const staleHome = cachedHomeSnapshot;
-  const staleShell = cachedShellSnapshot;
-
-  const navMenuItems =
-    navMenuItemsResult.status === 'fulfilled'
-      ? navMenuItemsResult.value
-      : staleHome?.navMenuItems || staleShell?.navMenuItems || [];
-
-  return {
-    activeSections:
-      activeSectionsResult.status === 'fulfilled'
-        ? activeSectionsResult.value
-        : staleHome?.activeSections || [],
-    heroBanners:
-      heroBannersResult.status === 'fulfilled'
-        ? heroBannersResult.value
-        : staleHome?.heroBanners || [],
-    navMenuItems,
-    popups:
-      popupsResult.status === 'fulfilled'
-        ? popupsResult.value
-        : staleHome?.popups || [],
-    quickMenuItems:
-      quickMenuItemsResult.status === 'fulfilled'
-        ? quickMenuItemsResult.value
-        : staleHome?.quickMenuItems || [],
-    tabMenuItems:
-      tabMenuItemsResult.status === 'fulfilled'
-        ? tabMenuItemsResult.value
-        : staleHome?.tabMenuItems || [],
-  };
-};
+// The current home only consumes navigation from this provider.
+// Removed CMS widgets must not trigger unused database requests.
+const fetchHomeContent = fetchShellContent;
 
 const getCachedShellContent = async (force = false) => {
   const now = Date.now();

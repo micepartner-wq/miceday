@@ -1,5 +1,8 @@
 // Email API 호출 유틸리티 (Firebase Cloud Functions)
 
+// Enable only after the tracking functions and their private datastore are deployed.
+export const INQUIRY_DELIVERY_TRACKING_ENABLED = import.meta.env.VITE_INQUIRY_DELIVERY_TRACKING_ENABLED === 'true';
+
 export interface BookingNotificationItem {
     name: string;
     quantity: number;
@@ -36,8 +39,8 @@ export interface InquiryNotificationPayload {
     content?: string;
 }
 
-const isLocalhost = () =>
-    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isLocalhost = () => import.meta.env.DEV ||
+    ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
 
 const resolveEmailApiUrl = (cloudFunctionName: string, hostedPath: string) =>
     isLocalhost()
@@ -68,6 +71,7 @@ const postEmailRequest = async (
         method: 'POST',
         headers,
         body: JSON.stringify(body),
+        signal: AbortSignal.timeout(90000),
     });
 
     const contentType = response.headers.get('content-type') || '';
@@ -77,6 +81,10 @@ const postEmailRequest = async (
 
     if (!response.ok) {
         throw new Error(getResponseErrorMessage(payload));
+    }
+
+    if (!contentType.includes('application/json') || !payload || typeof payload !== 'object') {
+        throw new Error('알림 API가 올바른 응답을 반환하지 않았습니다. 문의 접수 내역은 유지됩니다.');
     }
 
     return payload;
@@ -165,16 +173,38 @@ export const sendBookingRequestNotificationEmail = async (
 
 export const sendInquiryNotificationEmail = async (
     payload: InquiryNotificationPayload,
+    idToken?: string,
 ) => {
     try {
+        if (idToken && !INQUIRY_DELIVERY_TRACKING_ENABLED) {
+            throw new Error('알림 재시도 기능은 서버 준비 후 사용할 수 있습니다.');
+        }
         const apiUrl = resolveEmailApiUrl(
             'sendInquiryNotification',
             '/api/email/inquiry-notification',
         );
 
-        return await postEmailRequest(apiUrl, payload);
+        // The currently deployed function still needs the complete payload.
+        // The new function reads the saved inquiry and ignores these extra fields.
+        const result = await postEmailRequest(apiUrl, { ...payload, ...(idToken ? { retry: true } : {}) }, idToken);
+        const legacyAccepted = result.status === undefined && result.skipped !== true
+            && result.message === 'Inquiry notification email sent successfully'
+            && Number.isInteger(result.recipientCount) && result.recipientCount > 0;
+        if (result.status !== 'sent' && !legacyAccepted) {
+            throw new Error(result.error || '문의는 접수되었으나 알림 발송 완료를 확인하지 못했습니다.');
+        }
+        return result;
     } catch (error) {
         console.error('Inquiry notification email send failed:', error);
         throw error;
     }
+};
+
+export interface InquiryDeliveryState { status: 'sent' | 'sending' | 'failed' | 'uncertain' | 'skipped' | 'untracked'; attempts?: number; updatedAt?: string; error?: string }
+export interface InquiryMonitor { enabled: boolean; startedAt?: string; lastCheckedAt?: string; lastError?: string }
+export const getInquiryNotificationStates = async (ids: string[], idToken: string, enable = false): Promise<{ states: Record<string, InquiryDeliveryState>; monitor: InquiryMonitor }> => {
+    if (!INQUIRY_DELIVERY_TRACKING_ENABLED) throw new Error('알림 추적 서버 준비 중입니다.');
+    const result = await postEmailRequest('https://us-central1-human-partner.cloudfunctions.net/inquiryNotificationStatus', { ids, ...(enable ? { action: 'enable' } : {}) }, idToken);
+    if (!result.states || !result.monitor) throw new Error('알림 상태 응답을 확인할 수 없습니다. 서버 배포 상태를 확인해 주세요.');
+    return result;
 };

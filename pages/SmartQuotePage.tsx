@@ -48,6 +48,7 @@ export const SmartQuotePage: React.FC = () => {
   const [isQuick, setIsQuick] = useState(!packageName);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [submittedId, setSubmittedId] = useState('');
+  const [notificationWarning, setNotificationWarning] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const submittingRef = useRef(false);
@@ -243,6 +244,7 @@ ${services.join('||')}
         });
       } catch (emailError) {
         console.error('Failed to send inquiry notification email:', emailError);
+        setNotificationWarning(true);
       }
 
       setSubmittedId(inquiryId);
@@ -423,6 +425,7 @@ ${services.join('||')}
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">견적 의뢰가 성공적으로 접수되었습니다!</h2>
                 <p className="mb-4 break-all text-sm text-gray-600">접수번호: {submittedId}</p>
+                {notificationWarning && <p role="status" className="mb-5 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">문의 내용은 안전하게 접수되었으나 담당자 알림 전달을 확인하지 못했습니다. 같은 문의를 다시 제출하지 않으셔도 됩니다. 일정이 급하시면 <a href="tel:18001985" className="font-semibold underline">1800-1985</a>로 접수번호와 함께 연락해 주세요.</p>}
                 <p className="text-gray-500 mb-10">
                   작성해주신 내용을 바탕으로 최적의 솔루션을 구성하고 있습니다.<br/>
                   영업일 기준 24시간 이내에 담당자가 연락드리겠습니다.

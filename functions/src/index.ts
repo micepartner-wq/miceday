@@ -1,3 +1,4 @@
+import { createInquiryNotifications, SavedInquiry } from './inquiryNotifications';
 import * as admin from "firebase-admin";
 import * as cors from "cors";
 import * as dotenv from "dotenv";
@@ -171,6 +172,9 @@ const getGmailEnvironment = () => {
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 30000,
     auth: {
         user: normalizeEnvValue(process.env.GMAIL_EMAIL),
         pass: normalizeEnvValue(process.env.GMAIL_APP_PASSWORD),
@@ -588,6 +592,7 @@ const requestJson = <T>(
         }
 
         request.end();
+        request.setTimeout(15000, () => request.destroy(new Error("Request timed out")));
         request.on("error", reject);
     });
 
@@ -894,107 +899,40 @@ export const sendBookingRequestNotification = functions.https.onRequest((req, re
     });
 });
 
-export const sendInquiryNotification = functions.https.onRequest((req, res) => {
-    corsHandler(req, res, async () => {
-        if (req.method === "OPTIONS") {
-            res.status(204).send("");
-            return;
-        }
 
-        if (req.method !== "POST") {
-            res.status(405).send("Method Not Allowed");
-            return;
-        }
-
-        try {
-            const payload = req.body as Record<string, unknown>;
-            const title = getOptionalText(payload.title);
-            const requesterName = getOptionalText(payload.requesterName);
-
-            if (!title || !requesterName) {
-                res.status(400).json({
-                    error: "Missing required fields (title, requesterName)",
-                });
-                return;
-            }
-
-            const notificationPayload: InquiryNotificationRequest = {
-                inquiryId: getOptionalText(payload.inquiryId) || 'unknown',
-                title,
-                requesterName,
-                companyName: getOptionalText(payload.companyName),
-                phone: getOptionalText(payload.phone),
-                userEmail: getOptionalText(payload.userEmail),
-                pax: getOptionalText(payload.pax),
-                budget: getOptionalText(payload.budget),
-                location: getOptionalText(payload.location),
-                date: getOptionalText(payload.date),
-                services: Array.isArray(payload.services) ? payload.services.map(s => String(s)) : [],
-                content: getOptionalText(payload.content),
-            };
-
-            const runtimeConfig = await loadBookingEmailRuntimeConfig();
-
-            if (!runtimeConfig.notificationsEnabled) {
-                await persistBookingEmailLog({
-                    productName: notificationPayload.title,
-                    requesterEmail: notificationPayload.userEmail,
-                    status: "skipped",
-                    errorMessage: "관리자 메일 알림이 비활성화되어 있습니다.",
-                });
-
-                res.status(200).json({
-                    message: "Inquiry notification skipped because notifications are disabled",
-                    skipped: true,
-                });
-                return;
-            }
-
-            if (runtimeConfig.recipients.length === 0) {
-                await persistBookingEmailLog({
-                    productName: notificationPayload.title,
-                    requesterEmail: notificationPayload.userEmail,
-                    status: "failed",
-                    errorMessage: "수신 이메일이 설정되지 않았습니다.",
-                });
-
-                res.status(500).json({ error: "Missing booking alert recipients" });
-                return;
-            }
-
-            const info = await sendHtmlEmail({
-                to: runtimeConfig.recipients,
-                subject: `[행사어때] 신규 견적/제휴 문의 접수 - ${notificationPayload.title}`,
-                html: buildInquiryRequestEmailHtml(notificationPayload),
-            });
-            
-            console.log("Inquiry notification email sent successfully:", {
-                inquiryId: notificationPayload.inquiryId,
-                recipients: runtimeConfig.recipients,
-                emailId: info.id,
-            });
-
-            await persistBookingEmailLog({
-                productName: notificationPayload.title,
-                requesterEmail: notificationPayload.userEmail,
-                recipientEmails: runtimeConfig.recipients,
-                status: "sent",
-            });
-
-            res.status(200).json({
-                message: "Inquiry notification email sent successfully",
-                recipientCount: runtimeConfig.recipients.length,
-            });
-        } catch (error) {
-            console.error("Error sending inquiry notification email:", error);
-            const payload = req.body as Record<string, unknown>;
-            await persistBookingEmailLog({
-                productName: getOptionalText(payload.title),
-                requesterEmail: getOptionalText(payload.userEmail),
-                status: "failed",
-                errorMessage: getErrorMessage(error),
-            });
-            res.status(500).json({ error: "Failed to send inquiry notification email", details: getErrorMessage(error) });
-        }
-    });
+const inquiryDelivery = createInquiryNotifications({
+    getInquiry: async id => (await requestJson<SavedInquiry[]>(
+        SUPABASE_REST_URL + '/inquiries?select=id,title,user_name,user_email,company_name,content,category,created_at&id=eq.' + encodeURIComponent(id),
+        { headers: getSupabaseHeaders() }
+    ))[0],
+    listNew: async (after, afterId) => requestJson<SavedInquiry[]>(
+        SUPABASE_REST_URL + '/inquiries?select=id,title,user_name,user_email,company_name,content,category,created_at&category=in.(quote,partner)&order=created_at.asc,id.asc&limit=30&or=' +
+        encodeURIComponent('(created_at.gt.' + after + ',and(created_at.eq.' + after + ',id.gt.' + afterId + '))'),
+        { headers: getSupabaseHeaders() }
+    ),
+    isAdmin: async uid => {
+        const profiles = await requestJson<Array<{ is_admin: boolean }>>(
+            SUPABASE_REST_URL + '/user_profiles?select=is_admin&firebase_uid=eq.' + encodeURIComponent(uid),
+            { headers: getSupabaseHeaders() }
+        );
+        return profiles.length === 1 && profiles[0].is_admin === true;
+    },
+    config: loadBookingEmailRuntimeConfig,
+    send: async (inquiry, recipients) => sendHtmlEmail({
+        to: recipients,
+        subject: '[행사어때] 신규 견적/제휴 문의 접수 - ' + inquiry.title,
+        html: buildInquiryRequestEmailHtml({
+            inquiryId: inquiry.id, title: inquiry.title,
+            requesterName: inquiry.user_name || inquiry.company_name || '문의 고객',
+            companyName: inquiry.company_name, userEmail: inquiry.user_email,
+            content: inquiry.content,
+        }),
+    }),
+    log: async (inquiry, recipients, status, errorMessage) => persistBookingEmailLog({
+        productName: inquiry.title, requesterEmail: inquiry.user_email,
+        recipientEmails: recipients, status, errorMessage,
+    }),
 });
+export const sendInquiryNotification = inquiryDelivery.send;
+export const inquiryNotificationStatus = inquiryDelivery.status;
+export const reconcileInquiryNotifications = inquiryDelivery.reconcile;

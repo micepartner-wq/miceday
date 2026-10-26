@@ -1,6 +1,7 @@
+import { ServiceOverview } from '../components/ServiceOverview';
 import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, MessageCircleMore, Target, Layout, Mic, Package, Briefcase } from 'lucide-react';
+import { Star, MessageCircleMore } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Hero } from '../components/Hero';
 import { SpaceCarousel } from '../components/ui/SpaceCarousel';
@@ -214,68 +215,17 @@ export const MainPage = () => {
                 <SpaceCarousel />
             </section>
 
-<section className="py-24 bg-slate-50 overflow-hidden border-y border-slate-100">
+<section id="service-overview" className="scroll-mt-28 py-14 md:py-20 bg-[#f3f5f0] overflow-hidden border-y border-slate-100">
                 <FadeInSection>
                 <Container>
-                    <div className="mb-16 md:mb-20 text-center max-w-3xl mx-auto flex flex-col items-center">
-                        
-                        <h2 className="text-2xl sm:text-3xl md:text-[40px] lg:text-[44px] font-extrabold tracking-tight text-slate-900 leading-[1.35] md:leading-[1.25] mb-6 break-keep">
-                            사소한 비품부터 대형 시스템까지<br/>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39B54A] to-[#268a33]">'종합 대행' 역량 솔루션</span>
-                        </h2>
-                        <p className="text-slate-500 text-base sm:text-lg md:text-xl font-medium leading-relaxed break-keep">
-                            부스 시공부터 화려한 무대 연출, 행사의 디테일까지 행사어때가 완벽하게 통제합니다.
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="group rounded-[2rem] bg-white border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col">
-                            <div className="h-56 bg-slate-100 overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="전시 부스 및 시설물" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
-                                <div className="absolute bottom-4 left-6">
-                                    <span className="px-3 py-1 bg-blue-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-full">System & Facilities</span>
-                                </div>
+                    <ServiceOverview />
+                    <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-slate-200 pt-6 md:grid-cols-4" aria-label="행사어때의 네 가지 약속">
+                        {promises.map(promise => (
+                            <div key={promise.title} className="text-center">
+                                <h3 className="text-sm font-bold text-slate-900 break-keep">{promise.title}</h3>
+                                <p className="mt-1 text-xs leading-5 text-slate-600 break-keep">{promise.desc}</p>
                             </div>
-                            <div className="p-8 flex-1">
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">전시 부스 및 무대 시공</h3>
-                                <p className="text-slate-600 text-sm leading-relaxed">
-                                    대규모 옥타늄 전시 부스 시공, 무대 음향 및 특수조명 시스템, 포토존 및 이벤트 공간 제작, 행사의 뼈대가 되는 강력한 하드웨어를 세팅합니다.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="group rounded-[2rem] bg-white border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col">
-                            <div className="h-56 bg-slate-100 overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="운영 비품 및 제작물" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
-                                <div className="absolute bottom-4 left-6">
-                                    <span className="px-3 py-1 bg-[#39B54A]/90 backdrop-blur-sm text-white text-xs font-bold rounded-full">Detailed Operation</span>
-                                </div>
-                            </div>
-                            <div className="p-8 flex-1">
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">디테일한 운영 비품 및 인쇄물</h3>
-                                <p className="text-slate-600 text-sm leading-relaxed">
-                                    대형 현수막과 포스터 출력, 쇼케이스 냉장고, 테이블 세트, 빈백 의자부터 참가자 간식과 이벤트 경품 구매/세팅까지 담당자의 수고를 덜어드립니다.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="group rounded-[2rem] bg-white border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col">
-                            <div className="h-56 bg-slate-100 overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="전문 인력 및 현장 운영" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
-                                <div className="absolute bottom-4 left-6">
-                                    <span className="px-3 py-1 bg-purple-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-full">Directing & Staff</span>
-                                </div>
-                            </div>
-                            <div className="p-8 flex-1">
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">전문 인력 및 현장 디렉팅</h3>
-                                <p className="text-slate-600 text-sm leading-relaxed">
-                                    경험 많은 총괄 연출자와 행사 전문 MC 섭외, 안전 요원 배치 및 영상 촬영, 매끄러운 진행을 책임질 검증된 스태프를 투입합니다.
-                                </p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </Container>
                 </FadeInSection>
@@ -300,78 +250,14 @@ export const MainPage = () => {
                 </div>
             </section>
 
-<section className="bg-slate-950 py-12 md:py-16 text-white relative z-20 shadow-2xl">
-                <FadeInSection delay={100}>
+            <section className="bg-white py-8 md:py-10" aria-labelledby="partner-heading">
                 <Container>
-                    <div className="grid grid-cols-2 gap-8 md:grid-cols-4 divide-x divide-white/10">
-                        {promises.map((promise, idx) => (
-                            <div key={idx} className="flex flex-col items-center justify-center text-center px-4">
-                                <h3 className="text-lg sm:text-xl md:text-2xl font-extrabold tracking-tight text-white mb-3 break-keep">
-                                    {promise.title}
-                                </h3>
-                                <p className="text-xs sm:text-sm md:text-base font-medium text-[#39B54A] tracking-wide break-keep">
-                                    {promise.desc}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+                    <h2 id="partner-heading" className="mb-6 text-center text-xl font-bold tracking-tight text-slate-900 sm:text-2xl break-keep">
+                        행사어때와 함께한 기업·기관
+                    </h2>
                 </Container>
-                </FadeInSection>
-            </section>
-
-{/* 2. 핵심 가치 (Core Values) */}
-            <section className="py-24 bg-white relative overflow-hidden">
-                <FadeInSection>
-                <Container>
-                    <div className="mb-16 md:mb-20 text-center max-w-4xl mx-auto relative z-10 flex flex-col items-center">
-                        <h2 className="text-2xl sm:text-3xl md:text-[40px] lg:text-[44px] font-extrabold tracking-tight text-slate-900 leading-[1.35] md:leading-[1.25] mb-6 break-keep">
-                            모든 것이 완벽해야 하는 <span className="text-[#39B54A]">날.</span>
-                        </h2>
-                        <p className="text-slate-500 text-base sm:text-lg md:text-xl font-medium leading-relaxed break-keep">
-                            행사어때가 기획부터 운영, 철수까지 모든 과정을 완벽하게 책임집니다.
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            { icon: Target, title: '맞춤 기획', desc: '행사 목적과 예산에 맞는 최적의 기획안을 제안합니다.' },
-                            { icon: Layout, title: '공간 연출', desc: '컨셉에 맞는 무대, 부스, 조명 등 공간을 완벽히 세팅합니다.' },
-                            { icon: Briefcase, title: '현장 운영', desc: '행사 전 사전 설치부터 마무리 및 회수까지 모든 과정을 책임집니다.' },
-                            { icon: Package, title: '장비 렌탈', desc: 'IT 기기부터 음향·영상 장비까지 원스톱으로 제공합니다.' },
-                        ].map((item, idx) => (
-                            <div key={idx} className="bg-white rounded-2xl p-8 border border-slate-100 text-center">
-                                <div className="w-16 h-16 mx-auto bg-[#39B54A]/5 text-[#39B54A] rounded-2xl flex items-center justify-center mb-6">
-                                    <item.icon size={32} strokeWidth={1.5} />
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                                <p className="text-slate-500 text-[15px] leading-relaxed break-keep">{item.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </Container>
-                </FadeInSection>
-            </section>
-
-{/* Empathy Full Banner (Parallax Scrolling) */}
-            <section 
-                className="relative py-24 md:py-32 flex items-center justify-center text-center overflow-hidden bg-fixed bg-center bg-cover bg-no-repeat"
-                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&auto=format&fit=crop&w=2560&q=80')" }}
-            >
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px]"></div>
-                <div className="relative z-10 px-4 max-w-4xl mx-auto">
-                    <FadeInSection>
-                        <p className="text-[#39B54A] font-bold tracking-widest mb-4 uppercase text-sm md:text-base">TRUSTED BY</p>
-                        <h2 className="text-2xl sm:text-3xl md:text-[40px] lg:text-[44px] font-extrabold tracking-tight text-slate-900 leading-[1.4] md:leading-[1.3] break-keep">
-                            이미 수많은 기업과 기관들이<br/>
-                            행사어때와 성공적인 비즈니스를<br className="md:hidden" /> 경험했습니다
-                        </h2>
-                    </FadeInSection>
-                </div>
-            </section>
-
-<div className="bg-white py-4">
                 <PartnerCarousel />
-            </div>
+            </section>
 
 {/* 기존 고객 후기 (Star Reviews) */}
             <section className="py-24 bg-white border-b border-slate-100">

@@ -11,6 +11,8 @@ export const PartnerPage: React.FC = () => {
     const location = useLocation();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [notificationWarning, setNotificationWarning] = useState(false);
+    const [submittedId, setSubmittedId] = useState('');
     const [businessNumber, setBusinessNumber] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [companyName, setCompanyName] = useState('');
@@ -85,6 +87,7 @@ export const PartnerPage: React.FC = () => {
             ]).select().single();
 
             if (error) throw error;
+            setSubmittedId(result.id);
             
             try {
                 await sendInquiryNotificationEmail({
@@ -98,6 +101,7 @@ export const PartnerPage: React.FC = () => {
                 });
             } catch (emailError) {
                 console.error("이메일 발송 실패:", emailError);
+                setNotificationWarning(true);
             }
             
             setIsSubmitting(false);
@@ -121,6 +125,8 @@ export const PartnerPage: React.FC = () => {
                             <CheckCircle2 size={48} />
                         </div>
                         <h2 className="text-3xl font-extrabold text-slate-900 mb-4 tracking-tight">접수 완료!</h2>
+                        <p className="mb-4 break-all text-xs text-slate-500">접수번호: {submittedId}</p>
+                        {notificationWarning && <p role="status" className="mb-5 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">문의는 접수되었으나 담당자 알림 전달을 확인하지 못했습니다. 다시 제출하지 않으셔도 됩니다. 급한 문의는 <a href="tel:18001985" className="underline">1800-1985</a>로 접수번호와 함께 연락해 주세요.</p>}
                         <p className="text-slate-500 mb-10 leading-relaxed text-lg">
                             보내주신 내용을 담당자가 확인 후<br />
                             빠른 시일 안에 연락드리겠습니다.

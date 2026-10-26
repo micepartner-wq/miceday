@@ -156,8 +156,8 @@ export const SectionManager: React.FC = () => {
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">섹션 관리</h1>
-                    <p className="text-sm text-slate-500 mt-1">메인 페이지에 표시될 섹션을 관리합니다</p>
+                    <h1 className="text-2xl font-bold text-slate-800">상품 섹션 분류</h1>
+                    <p className="text-sm text-slate-500 mt-1">상품 편집에서 사용하는 섹션 분류를 관리합니다. 메인 화면의 서비스 소개와 갤러리는 별도 메뉴에서 수정하세요.</p>
                 </div>
                 <button
                     onClick={openAddModal}
@@ -304,7 +304,7 @@ export const SectionManager: React.FC = () => {
                                     className="w-4 h-4 text-[#39B54A] rounded focus:ring-[#39B54A]"
                                 />
                                 <label htmlFor="is_active" className="text-sm text-slate-700">
-                                    메인 페이지에 표시
+                                    섹션 활성화
                                 </label>
                             </div>
 
