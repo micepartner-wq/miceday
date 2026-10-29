@@ -673,12 +673,61 @@ function buildAllianceSchemas(member, canonicalUrl, imageUrl, description) {
   ];
 }
 
+const xmlEscape = (value) =>
+  String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// /alliance routes currently render NotFound in the app, so they are left out of the sitemap.
+async function writeSitemap({ servicePaths, products, notices, installationCases }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const entries = [];
+  const seen = new Set();
+  const add = (routePath, changefreq, priority, lastmod = today) => {
+    if (seen.has(routePath)) return;
+    seen.add(routePath);
+    const date = toDateOnly(lastmod) || today;
+    entries.push(
+      `  <url>
+    <loc>${xmlEscape(absoluteUrl(routePath))}</loc>
+    <lastmod>${date}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`
+    );
+  };
+
+  add('/', 'daily', '1.0');
+  add('/products', 'daily', '0.8');
+  servicePaths.forEach(servicePath => add(servicePath, 'weekly', '0.9'));
+  add('/cases', 'monthly', '0.6');
+  add('/notices', 'monthly', '0.6');
+  add('/cs', 'monthly', '0.6');
+  add('/terms', 'yearly', '0.3');
+  add('/privacy', 'yearly', '0.3');
+
+  products.filter(item => item?.id).forEach(item => add(`/products/${item.id}`, 'weekly', '0.7', item.created_at));
+  notices.filter(item => item?.id).forEach(item =>
+    add(`/notices/${item.id}`, 'weekly', '0.7', item.updated_at || item.published_at || item.created_at));
+  installationCases.filter(item => item?.id).forEach(item =>
+    add(`/cases/${item.id}`, 'weekly', '0.7', item.updated_at || item.published_at || item.created_at));
+
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...entries,
+    '</urlset>',
+    '',
+  ].join('\n');
+  await writeFile(path.join(DIST_DIR, 'sitemap.xml'), xml, 'utf8');
+  console.log(`[prerender] Wrote sitemap.xml with ${entries.length} URLs.`);
+}
+
 async function main() {
   const baseHtml = await readFile(path.join(DIST_DIR, 'index.html'), 'utf8');
   const supabaseConfig = await readSupabaseConfig();
 
-  // Let Firebase Hosting serve /sitemap.xml via the Cloud Function rewrite.
-  await rm(path.join(DIST_DIR, 'sitemap.xml'), { force: true });
+  // The sitemap Cloud Function needs the Blaze plan, so generate a static sitemap.xml instead.
+  const staticSitemap = await readFile(path.join(DIST_DIR, 'sitemap.xml'), 'utf8').catch(() => '');
+  const servicePaths = [...staticSitemap.matchAll(/<loc>https:\/\/miceday\.co\.kr(\/service\/[^<]*)<\/loc>/g)].map(m => m[1]);
 
   for (const route of staticRoutes) {
     const html = renderHtml(baseHtml, route);
@@ -691,6 +740,8 @@ async function main() {
     fetchInstallationCasePages(supabaseConfig),
     fetchAllianceMemberPages(supabaseConfig),
   ]);
+
+  await writeSitemap({ servicePaths, products, notices, installationCases });
 
   for (const [routePath, records, field] of [
     ['/products', products, 'name'], ['/cases', installationCases, 'title'], ['/notices', notices, 'title'],
