@@ -1,8 +1,8 @@
 export const SITE_URL = 'https://miceday.co.kr';
 export const SITE_NAME = '행사어때';
-export const SITE_TITLE = '행사어때 | 대전 MICE 행사 통합운영 플랫폼';
+export const SITE_TITLE = '대전 MICE 행사 대행통합운영, 행사어때';
 export const SITE_DESCRIPTION =
-  '행사어때는 대전·충청권 MICE 행사에 필요한 기획, 장비 렌탈, 공간 연출, 운영 지원을 한 번에 제공하는 행사 통합운영 플랫폼입니다.';
+  '대전·충청권 행사대행과 세미나·학회·박람회 장비 렌탈, 설치부터 현장 운영까지 한 번에. 행사어때가 기업·학교·관공서 행사를 함께합니다.';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/logo_card.jpg`;
 export const ORGANIZATION_LOGO = `${SITE_URL}/Miceday_Logo.png`;
 export const INDEX_ROBOTS =

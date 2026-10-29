@@ -6,9 +6,9 @@ const DIST_DIR = path.join(ROOT_DIR, 'dist');
 
 const SITE_URL = 'https://miceday.co.kr';
 const SITE_NAME = '행사어때';
-const SITE_TITLE = '행사어때 | 대전 MICE 행사 통합운영 플랫폼';
+const SITE_TITLE = '대전 MICE 행사 대행통합운영, 행사어때';
 const SITE_DESCRIPTION =
-  '행사어때는 대전·충청권 MICE 행사에 필요한 기획, 장비 렌탈, 공간 연출, 운영 지원을 한 번에 제공하는 행사 통합운영 플랫폼입니다.';
+  '대전·충청권 행사대행과 세미나·학회·박람회 장비 렌탈, 설치부터 현장 운영까지 한 번에. 행사어때가 기업·학교·관공서 행사를 함께합니다.';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/logo_card.jpg`;
 const ORGANIZATION_LOGO = `${SITE_URL}/Miceday_Logo.png`;
 const INDEX_ROBOTS =
@@ -112,7 +112,7 @@ const staticRoutes = [
   {
     route: '/cases',
     title: '설치사례 | 행사어때',
-    description: '행사어때 설치사례 페이지입니다. 현장 설치 및 운영 사례를 확인할 수 있습니다.',
+    description: '대전·충청권 행사 설치사례. 세미나, 학회, 박람회 현장의 장비 설치와 운영 사례를 확인할 수 있습니다.',
     canonical: '/cases',
     robots: INDEX_ROBOTS,
   },
@@ -206,57 +206,57 @@ const staticRoutes = [
   // --- Service Category Routes ---
   {
     route: '/service/corporate-seminar',
-    title: '기업 세미나 행사 장비 및 운영 | 행사어때',
-    description: '성공적인 기업 세미나와 워크숍, 이사회를 위한 공간 대관부터 장비 렌탈, 현장 운영까지 행사어때가 함께합니다.',
+    title: '대전 기업 세미나 행사대행·장비 렌탈 | 행사어때',
+    description: '대전 기업 세미나·워크숍·이사회 행사대행. 공간 대관부터 장비 렌탈, 현장 운영까지 행사어때가 함께합니다.',
     canonical: '/service/corporate-seminar',
     robots: INDEX_ROBOTS,
   },
   {
     route: '/service/recruitment-training',
-    title: '채용 및 교육 행사 지원 | 행사어때',
-    description: '대규모 시험장, 면접장 구축부터 원활한 교육 진행을 위한 맞춤형 환경 조성 서비스를 제공합니다.',
+    title: '대전 채용·교육 행사 장비 렌탈·운영 | 행사어때',
+    description: '대전 대규모 시험장·면접장 구축부터 교육 행사 진행을 위한 장비 렌탈과 맞춤형 환경 조성을 제공합니다.',
     canonical: '/service/recruitment-training',
     robots: INDEX_ROBOTS,
   },
   {
     route: '/service/exhibition-expo',
-    title: '전시 및 박람회 통합 운영 | 행사어때',
-    description: '전시 부스 구축, 입주 박람회 기획 및 운영. 돋보이는 공간 연출로 성공적인 전시를 지원합니다.',
+    title: '대전 전시·박람회 부스 구축·운영 대행 | 행사어때',
+    description: '대전 전시 부스 구축, 입주 박람회 기획 및 운영 대행. 돋보이는 공간 연출로 성공적인 전시를 지원합니다.',
     canonical: '/service/exhibition-expo',
     robots: INDEX_ROBOTS,
   },
   {
     route: '/service/it-hackathon',
-    title: 'IT 컨퍼런스 및 해커톤 행사 | 행사어때',
-    description: '코딩 대회, e-스포츠, 해커톤 운영에 필수적인 고사양 네트워크와 전력, 맞춤형 장비를 지원합니다.',
+    title: '대전 IT 컨퍼런스·해커톤 행사 장비 렌탈 | 행사어때',
+    description: '대전 코딩 대회, e-스포츠, 해커톤 운영에 필수적인 고사양 네트워크와 전력, 맞춤형 장비를 지원합니다.',
     canonical: '/service/it-hackathon',
     robots: INDEX_ROBOTS,
   },
   {
     route: '/service/office',
-    title: '임시 사무실 구축 및 렌탈 | 행사어때',
-    description: '건설현장, 선거캠프, 모델하우스 등 단기 프로젝트를 위한 완벽한 임시 사무실 환경을 신속하게 구축합니다.',
+    title: '대전 임시 사무실 구축·렌탈 | 행사어때',
+    description: '대전 건설현장, 선거캠프, 모델하우스 등 단기 프로젝트를 위한 임시 사무실 환경을 신속하게 구축합니다.',
     canonical: '/service/office',
     robots: INDEX_ROBOTS,
   },
   {
     route: '/service/academic-conference',
-    title: '학회 및 컨퍼런스 기획 운영 | 행사어때',
-    description: '포스터 세션 전시, 등록 데스크 운영, VIP 의전까지 학술 행사의 품격을 높이는 전문 서비스를 제공합니다.',
+    title: '대전 학회·컨퍼런스 행사대행·운영 | 행사어때',
+    description: '대전 학회·학술 행사 대행. 포스터 세션 전시, 등록 데스크 운영, VIP 의전까지 전문 서비스를 제공합니다.',
     canonical: '/service/academic-conference',
     robots: INDEX_ROBOTS,
   },
   {
     route: '/service/public-administration',
-    title: '관공서 및 행정 행사 대행 | 행사어때',
-    description: '주민설명회, 국정감사, 공공기관 행사. 신뢰와 안전을 최우선으로 규정에 맞는 완벽한 행사를 운영합니다.',
+    title: '대전 관공서·공공기관 행사대행 | 행사어때',
+    description: '대전 주민설명회, 국정감사, 공공기관 행사 대행. 신뢰와 안전을 최우선으로 규정에 맞게 운영합니다.',
     canonical: '/service/public-administration',
     robots: INDEX_ROBOTS,
   },
   {
     route: '/service/performance-festival',
-    title: '공연 및 축제 기획 운영 | 행사어때',
-    description: '아티스트 섭외, MD샵 구성, 안전/보관소 운영까지. 관람객에게 잊지 못할 즐거움을 선사하는 축제를 만듭니다.',
+    title: '대전 공연·축제 기획·운영 대행 | 행사어때',
+    description: '대전 공연·축제 대행. 아티스트 섭외, MD샵 구성, 안전/보관소 운영까지 관람객에게 잊지 못할 축제를 만듭니다.',
     canonical: '/service/performance-festival',
     robots: INDEX_ROBOTS,
   },
