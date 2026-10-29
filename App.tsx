@@ -1,5 +1,6 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { initAnalytics, trackPageView } from './src/analytics';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import { AuthProvider } from './src/context/AuthContext';
@@ -151,10 +152,22 @@ const LazyRoute = ({
   </Suspense>
 );
 
+const PageViewTracker = () => {
+  const location = useLocation();
+  useEffect(() => {
+    initAnalytics();
+    // wait a moment so the page title is updated before it is recorded
+    const timer = window.setTimeout(() => trackPageView(location.pathname, location.search), 300);
+    return () => window.clearTimeout(timer);
+  }, [location.pathname, location.search]);
+  return null;
+};
+
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <PageViewTracker />
         <Routes>
           <Route path="/preview/business" element={<LazyRoute component={BusinessPreviewPage} />} />
           {/* Admin Routes - Protected */}
