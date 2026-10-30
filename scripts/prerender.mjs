@@ -548,13 +548,22 @@ function buildProductDescription(product) {
 }
 
 function buildProductSchemas(product, canonicalUrl, imageUrl, description) {
+  const isEventPackage = ['패키지', '해커톤', '축제'].some(word => product.name?.includes(word));
   return [
     buildBreadcrumbSchema([
       { name: '홈', item: SITE_URL },
       { name: '상품', item: `${SITE_URL}/products` },
       { name: product.name, item: canonicalUrl },
     ]),
-    {
+    isEventPackage ? {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: product.name,
+      description,
+      image: imageUrl,
+      url: canonicalUrl,
+      provider: { '@type': 'Organization', name: SITE_NAME },
+    } : {
       '@context': 'https://schema.org',
       '@type': 'Product',
       name: product.name,

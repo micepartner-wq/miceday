@@ -1393,6 +1393,15 @@ export const ProductDetailPage: React.FC = () => {
           : "https://schema.org/InStock",
     },
   };
+  const packageServiceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: product.name,
+    description: productDescription,
+    image: productImage,
+    url: absoluteUrl(productPath),
+    provider: { "@type": "Organization", name: "행사어때" },
+  };
 
   // If the product is an event package, show the Total Solution View
   if (product.name?.includes('패키지') || product.name?.includes('해커톤') || product.name?.includes('축제')) {
@@ -1403,7 +1412,7 @@ export const ProductDetailPage: React.FC = () => {
           description={productDescription}
           canonical={productPath}
           ogImage={productImage}
-          structuredData={[breadcrumbSchema, productSchema]}
+          structuredData={[breadcrumbSchema, packageServiceSchema]}
         />
         <PackageSolutionView product={product} />
       </>
