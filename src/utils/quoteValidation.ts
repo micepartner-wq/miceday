@@ -1,4 +1,8 @@
+export const REFERRAL_SOURCES = ['네이버', '구글', '블로그', '지인', '기타'] as const;
+
 export interface QuoteValidationInput {
+  referralSource: string;
+  referralSourceOther: string;
   managerName: string;
   phone: string;
   email: string;
@@ -16,6 +20,8 @@ export interface QuoteValidationInput {
 
 export function getQuoteErrors(data: QuoteValidationInput, quick: boolean, step: number): string[] {
   const errors: string[] = [];
+  if (!REFERRAL_SOURCES.some(source => source === data.referralSource)) errors.push('유입경로를 선택해주세요.');
+  if (data.referralSource === '기타' && !data.referralSourceOther.trim()) errors.push('기타 유입경로를 입력해주세요.');
   if (!data.managerName.trim()) errors.push('담당자 성함을 입력해주세요.');
   if (!/^01\d{8,9}$/.test(data.phone.replace(/\D/g, ''))) errors.push('휴대폰 번호를 확인해주세요.');
   if ((!quick && !data.email.trim()) || (data.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()))) errors.push('올바른 이메일 주소를 입력해주세요.');

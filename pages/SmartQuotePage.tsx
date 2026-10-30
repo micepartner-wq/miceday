@@ -5,7 +5,7 @@ import { addInquiry } from '../src/api/inquiryApi';
 import { sendInquiryNotificationEmail } from '../src/utils/email';
 import { uploadImage } from '../src/api/storageApi';
 import { useAuth } from '../src/context/AuthContext';
-import { getQuoteErrors } from '../src/utils/quoteValidation';
+import { getQuoteErrors, REFERRAL_SOURCES } from '../src/utils/quoteValidation';
 import { Calendar, ChevronRight, ChevronLeft, Check, CheckCircle2, BatteryCharging, Coffee, Megaphone, MonitorPlay, UploadCloud, Send, Layers, Palette, ClipboardList, CheckSquare, PenLine, Paperclip, X, MessageSquare, Mail, Phone, Briefcase, Award } from 'lucide-react';
 import DatePicker, { registerLocale } from "react-datepicker";
 import { ko } from "date-fns/locale/ko";
@@ -18,6 +18,8 @@ registerLocale("ko", ko);
 type ServiceType = 'stage' | 'booth' | 'power' | 'catering' | 'staff' | 'design' | 'planning';
 
 interface QuoteForm {
+  referralSource: string;
+  referralSourceOther: string;
   organization: string;
   managerName: string;
   phone: string;
@@ -48,7 +50,6 @@ export const SmartQuotePage: React.FC = () => {
   const [isQuick, setIsQuick] = useState(!packageName);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [submittedId, setSubmittedId] = useState('');
-  const [notificationWarning, setNotificationWarning] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const submittingRef = useRef(false);
@@ -56,6 +57,8 @@ export const SmartQuotePage: React.FC = () => {
   const [startDate, endDate] = dateRange;
   const endDateRef = useRef<DatePicker>(null);
   const [formData, setFormData] = useState<QuoteForm>({
+    referralSource: '',
+    referralSourceOther: '',
     organization: '',
     managerName: '',
     phone: '',
@@ -198,6 +201,7 @@ export const SmartQuotePage: React.FC = () => {
 ${caseTitle ? `■ 참고 사례: ${caseTitle}\n■ 사례 ID: ${caseId || ''}\n` : ''}
 ${packageName ? `■ 선택한 패키지: ${packageName}\n` : ''}■ 행사 예정일: ${dateText}
 ■ 연락처: ${formData.phone.trim()}
+■ 유입경로: ${formData.referralSource === '기타' ? `기타 (${formData.referralSourceOther.trim()})` : formData.referralSource}
 ■ 행사 장소: ${locationText}
 ■ 예상 규모: ${paxText}
 ■ 예산 범위: ${budgetText}
@@ -240,11 +244,10 @@ ${services.join('||')}
           location: locationText,
           date: dateText,
           services: mappedServices,
-          content: contentStr
+          content: contentStr.replace(/^■ 연락처:[^\r\n]*\r?\n/m, '')
         });
       } catch (emailError) {
         console.error('Failed to send inquiry notification email:', emailError);
-        setNotificationWarning(true);
       }
 
       setSubmittedId(inquiryId);
@@ -258,6 +261,45 @@ ${services.join('||')}
     }
   };
 
+
+  const renderReferralSource = () => (
+    <div>
+      <label htmlFor="quote-referral-source" className="block text-sm font-bold text-gray-700 mb-2">유입경로 <span className="text-red-500">*</span></label>
+      {formData.referralSource !== '기타' ? <div className="relative"><select id="quote-referral-source" aria-required="true" value={formData.referralSource}
+        onChange={e => setFormData(prev => ({ ...prev, referralSource: e.target.value }))}
+        className="w-full pl-4 pr-12 py-4 appearance-none bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm focus:border-[#39B54A] outline-none">
+        <option value="" disabled>유입경로를 선택해주세요</option>
+        {REFERRAL_SOURCES.map(source => <option key={source} value={source}>{source}</option>)}
+      </select><svg className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg></div> : (
+        <div className="relative flex items-center gap-2 w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-sm focus-within:border-[#39B54A]">
+        <span className="relative z-10 pointer-events-none shrink-0 text-gray-900">기타 :</span>
+        <input
+          id="quote-referral-source"
+          type="text"
+          autoFocus
+          aria-label="기타 유입경로"
+          aria-required="true"
+          value={formData.referralSourceOther}
+          onChange={e => setFormData(prev => ({ ...prev, referralSourceOther: e.target.value }))}
+          placeholder="직접 입력"
+          className={`relative z-10 min-w-0 bg-transparent text-gray-900 outline-none ${isQuick ? 'w-1/2 max-w-[240px] flex-none' : 'flex-1'}`}
+        />
+        <div className="pointer-events-none ml-auto shrink-0 w-5 h-5">
+          <svg className="pointer-events-none w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+          <select
+            aria-label="유입경로 다시 선택"
+            value={formData.referralSource}
+            onChange={e => setFormData(prev => ({ ...prev, referralSource: e.target.value }))}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm"
+          >
+            <option value="" disabled>유입경로를 선택해주세요</option>
+            {REFERRAL_SOURCES.map(source => <option key={source} value={source}>{source}</option>)}
+          </select>
+        </div>
+      )}
+    </div>
+  );
 
   const renderMobileHorizontalStepIndicator = () => (
     <div className="flex min-[1650px]:hidden items-center justify-between w-full max-w-sm mx-auto mb-12 mt-2 px-2">
@@ -424,8 +466,7 @@ ${services.join('||')}
                   <CheckCircle2 className="w-12 h-12 text-[#39B54A]" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">견적 의뢰가 성공적으로 접수되었습니다!</h2>
-                <p className="mb-4 break-all text-sm text-gray-600">접수번호: {submittedId}</p>
-                {notificationWarning && <p role="status" className="mb-5 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">문의 내용은 안전하게 접수되었으나 담당자 알림 전달을 확인하지 못했습니다. 같은 문의를 다시 제출하지 않으셔도 됩니다. 일정이 급하시면 <a href="tel:18001985" className="font-semibold underline">1800-1985</a>로 접수번호와 함께 연락해 주세요.</p>}
+                <p className="mb-4 text-sm text-gray-600">접수번호: {submittedId.slice(0, 8).toUpperCase()}</p>
                 <p className="text-gray-500 mb-10">
                   작성해주신 내용을 바탕으로 최적의 솔루션을 구성하고 있습니다.<br/>
                   영업일 기준 24시간 이내에 담당자가 연락드리겠습니다.
@@ -532,6 +573,7 @@ ${services.join('||')}
                       </div>
                     </div>
 
+                    {isQuick && renderReferralSource()}
                     <div className={isQuick ? 'hidden' : 'space-y-8'}>
                     <hr className="border-gray-100" />
 
@@ -644,11 +686,11 @@ ${services.join('||')}
                     </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <label className="block text-sm font-bold text-gray-700 flex items-center">
-                            예상 규모 인원 <span className="text-xs text-gray-400 ml-2 font-normal">(숫자만 입력)</span>
+                            규모 인원
                           </label>
                         <label className="flex items-center cursor-pointer group">
                           <input 
@@ -677,7 +719,7 @@ ${services.join('||')}
                             if (val.length > 6) val = val.slice(0, 6);
                             setFormData(prev => ({...prev, pax: val}));
                           }}
-                          placeholder={formData.isPaxUndecided ? "인원 미정" : "규모 파악을 위해 대략적인 인원을 적어주세요."}
+                          placeholder={formData.isPaxUndecided ? "인원 미정" : "대략 인원"}
                           className={`w-full px-5 py-4 pr-12 border rounded-xl text-sm outline-none transition-all ${
                             formData.isPaxUndecided 
                               ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
@@ -708,7 +750,7 @@ ${services.join('||')}
                               formData.budgetRange === '' ? 'text-gray-400' : 'text-gray-900'
                             }`}
                           >
-                            <option value="" disabled>예산 범위를 선택해주세요</option>
+                            <option value="" disabled>선택</option>
                             <option value="미정" className="text-gray-900">미정</option>
                             <option value="500만원" className="text-gray-900">500만원</option>
                             <option value="1000만원" className="text-gray-900">1,000만원</option>
@@ -739,6 +781,7 @@ ${services.join('||')}
                         )}
                       </div>
                     </div>
+                    <div>{renderReferralSource()}</div>
                     </div>
                     </div>
                   </div>

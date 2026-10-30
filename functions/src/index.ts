@@ -415,6 +415,7 @@ const renderContentAndAttachments = (rawContent?: string) => {
             if (line.startsWith('[스마트 견적 의뢰]') || 
                 line.startsWith('■ 행사 예정일') ||
                 line.startsWith('■ 행사 장소') ||
+                /^■ 연락처\s*:/.test(line) ||
                 line.startsWith('■ 예상 규모') ||
                 line.startsWith('■ 예산 범위')) {
                 continue;
@@ -464,7 +465,7 @@ const renderContentAndAttachments = (rawContent?: string) => {
 
 const buildInquiryRequestEmailHtml = (payload: InquiryNotificationRequest) => {
     const companyName = payload.companyName || "(미기재)";
-    const phone = payload.phone || "(미기재)";
+    const phone = payload.phone || payload.content?.match(/^■ 연락처\s*:\s*([^\r\n]*)/m)?.[1]?.trim() || "(미기재)";
     const userEmail = payload.userEmail || "(미기재)";
     const pax = payload.pax || "미정";
     const budget = payload.budget || "미정";
