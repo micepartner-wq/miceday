@@ -337,40 +337,18 @@ export const ProductListPage: React.FC = () => {
             />
 
             <Container>
-                {/* Breadcrumbs */}
-                {pageTitle !== '전체 상품' && !isSectionLandingPage && (
-                    <nav className="mb-4 md:mb-6">
-                        <ol className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
-                            <li>
-                                <Link to="/" className="hover:text-[#39B54A] transition-colors whitespace-nowrap">
-                                    홈
-                                </Link>
-                            </li>
-                            <li>
-                                <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
-                            </li>
-                            <li>
-                                <Link to="/products" className="hover:text-[#39B54A] transition-colors whitespace-nowrap">
-                                    전체보기
-                                </Link>
-                            </li>
-                            {currentGroup && currentGroup !== '전체 상품' && (
-                                <>
-                                    <li>
-                                        <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
-                                    </li>
-                                    <li className="font-semibold text-gray-900 truncate">
-                                        {currentGroup}
-                                    </li>
-                                </>
-                            )}
-                        </ol>
-                    </nav>
-                )}
-
+                <nav aria-label="현재 위치" className="mb-5 flex flex-wrap items-center gap-2 text-xs text-slate-500 md:mb-6">
+                    <Link to="/" className="hover:text-slate-900">홈</Link>
+                    <ChevronRight size={12} aria-hidden="true" />
+                    <Link to="/products" className="hover:text-slate-900" aria-current={!selectedCategory && !sectionId ? 'page' : undefined}>전체보기</Link>
+                    {(currentGroup || selectedCategory || sectionId) && <>
+                        <ChevronRight size={12} aria-hidden="true" />
+                        <span className="font-semibold text-slate-900" aria-current="page">{currentGroup || pageTitle}</span>
+                    </>}
+                </nav>
                 <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:mb-8">
                     <h1 className="text-[24px] font-bold tracking-[-0.02em] text-slate-900 md:text-3xl">
-                        {pageTitle}
+                        전체 상품
                     </h1>
                     <div className="relative w-full md:max-w-[300px]">
                         <input
@@ -387,28 +365,30 @@ export const ProductListPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="scrollbar-hide -mx-1 mb-8 overflow-x-auto px-1 md:mb-10 md:overflow-visible">
-                    <div className="inline-flex min-w-full gap-3 md:flex md:min-w-0 md:flex-wrap md:gap-4">
-                        {displayedCategories.map((category, index) => {
-                            const isActive = activeCategory === category;
+                <div className="mb-8">
+                    <nav aria-label="카테고리" className="flex flex-wrap gap-2">
+                        <Link to="/products" aria-current={!selectedCategory && !sectionId ? 'page' : undefined}
+                            className={`rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${!selectedCategory && !sectionId ? 'border-[#39B54A] bg-[#39B54A] text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-green-400 hover:bg-green-50'}`}>
+                            전체 상품
+                        </Link>
+                        {toUnique([
+                            ...navMenuItems.flatMap((item) => item.category ? [item.category] : item.name && parentToChildMap[item.name] ? [item.name] : []),
+                            ...(currentGroup || selectedCategory ? [currentGroup || selectedCategory || ''] : []),
+                        ]).filter((group) => !['기타공사', '협력업체', '음식', '사무기기', '공연/축제', '영상/음향', 'IT장비'].includes(group.replace(/\s+/g, ''))).map((group) => <Link key={group} to={buildParentCategoryPath(group, navMenuItems)}
+                            aria-current={(currentGroup || selectedCategory) === group ? 'true' : undefined}
+                            className={`rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${(currentGroup || selectedCategory) === group ? 'border-[#39B54A] bg-[#39B54A] text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-green-400 hover:bg-green-50'}`}>
+                            {group}
+                        </Link>)}
+                    </nav>
+                    {currentGroup && <nav aria-label={`${currentGroup} 세부 유형`} className="mt-4 flex flex-wrap items-center gap-2 rounded-xl bg-slate-50 p-3">
 
-                            return (
-                                <Link
-                                    key={`${category}-${index}`}
-                                    to={getCategoryLink(category)}
-                                    className={`h-[40px] min-w-[96px] shrink-0 rounded-xl border px-4 text-center text-[14px] font-semibold leading-[40px] transition-all md:text-[15px] ${
-                                        isActive
-                                            ? 'border-[#39B54A] bg-[#39B54A] text-white shadow-sm'
-                                            : 'border-slate-200 bg-white text-slate-600 hover:border-[#39B54A] hover:text-[#39B54A]'
-                                    }`}
-                                >
-                                    {category}
-                                </Link>
-                            );
-                        })}
-                    </div>
+                        {displayedCategories.map((category) => <Link key={category} to={getCategoryLink(category)}
+                            aria-current={activeCategory === category ? 'page' : undefined}
+                            className={`rounded-lg px-3 py-2 text-sm transition-colors ${activeCategory === category ? 'bg-white font-semibold text-green-700 shadow-sm ring-1 ring-slate-200' : 'text-slate-600 hover:bg-white'}`}>
+                            {category === ALL_PRODUCTS_CATEGORY ? `${currentGroup} 전체` : category}
+                        </Link>)}
+                    </nav>}
                 </div>
-
                 {loading ? (
                     <div className="flex justify-center py-20">
                         <Loader2 className="animate-spin text-[#39B54A]" size={40} />
