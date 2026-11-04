@@ -45,7 +45,6 @@ export const SmartQuotePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const packageName = searchParams.get('package_name');
   const caseTitle = searchParams.get('case_title');
-  const caseId = searchParams.get('case_id');
   const [step, setStep] = useState(1);
   const [isQuick, setIsQuick] = useState(!packageName);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -198,7 +197,7 @@ export const SmartQuotePage: React.FC = () => {
       }
       
       const contentStr = `[스마트 견적 의뢰]
-${caseTitle ? `■ 참고 사례: ${caseTitle}\n■ 사례 ID: ${caseId || ''}\n` : ''}
+${caseTitle ? `■ 참고 사례: ${caseTitle}\n` : ''}
 ${packageName ? `■ 선택한 패키지: ${packageName}\n` : ''}■ 행사 예정일: ${dateText}
 ■ 연락처: ${formData.phone.trim()}
 ■ 유입경로: ${formData.referralSource === '기타' ? `기타 (${formData.referralSourceOther.trim()})` : formData.referralSource}
