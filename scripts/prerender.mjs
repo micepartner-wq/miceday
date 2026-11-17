@@ -274,7 +274,17 @@ function escapeHtml(value = '') {
 function absoluteUrl(pathOrUrl = '/') {
   if (!pathOrUrl) return SITE_URL;
   if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
-  return `${SITE_URL}${pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`}`;
+  const path = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
+  return `${SITE_URL}${withTrailingSlash(path)}`;
+}
+
+// Firebase Hosting 301-redirects /foo to /foo/ for prerendered directories,
+// so canonical URLs and the sitemap use the slash form that actually serves 200.
+function withTrailingSlash(path) {
+  const match = path.match(/^([^?#]*)(.*)$/);
+  const pathname = match[1];
+  if (pathname.endsWith('/') || /\.[a-z0-9]+$/i.test(pathname)) return path;
+  return `${pathname}/${match[2]}`;
 }
 
 function stripHtml(value = '') {
@@ -552,7 +562,7 @@ function buildProductSchemas(product, canonicalUrl, imageUrl, description) {
   return [
     buildBreadcrumbSchema([
       { name: '홈', item: SITE_URL },
-      { name: '상품', item: `${SITE_URL}/products` },
+      { name: '상품', item: `${SITE_URL}/products/` },
       { name: product.name, item: canonicalUrl },
     ]),
     isEventPackage ? {
@@ -649,7 +659,7 @@ function buildAllianceSchemas(member, canonicalUrl, imageUrl, description) {
   return [
     buildBreadcrumbSchema([
       { name: '홈', item: SITE_URL },
-      { name: '회원사', item: `${SITE_URL}/alliance` },
+      { name: '회원사', item: `${SITE_URL}/alliance/` },
       { name: member.name, item: canonicalUrl },
     ]),
     {
@@ -804,7 +814,7 @@ async function main() {
       type: 'article',
       jsonLd: buildArticleSchemas({
         listName: '공지사항',
-        listUrl: `${SITE_URL}/notices`,
+        listUrl: `${SITE_URL}/notices/`,
         title: notice.title,
         canonicalUrl,
         imageUrl,
@@ -836,7 +846,7 @@ async function main() {
       type: 'article',
       jsonLd: buildArticleSchemas({
         listName: '설치사례',
-        listUrl: `${SITE_URL}/cases`,
+        listUrl: `${SITE_URL}/cases/`,
         title: item.title,
         canonicalUrl,
         imageUrl,

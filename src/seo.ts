@@ -25,10 +25,19 @@ export const ORGANIZATION = {
   },
 };
 
+// Firebase Hosting 301-redirects /foo to /foo/ for prerendered directories,
+// so canonical URLs use the slash form that actually serves 200.
+const withTrailingSlash = (path: string) => {
+  const [, pathname, rest] = path.match(/^([^?#]*)(.*)$/)!;
+  if (pathname.endsWith('/') || /\.[a-z0-9]+$/i.test(pathname)) return path;
+  return `${pathname}/${rest}`;
+};
+
 export const absoluteUrl = (pathOrUrl: string) => {
   if (!pathOrUrl) return SITE_URL;
   if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
-  return `${SITE_URL}${pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`}`;
+  const path = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
+  return `${SITE_URL}${withTrailingSlash(path)}`;
 };
 
 export const serializeJsonLd = (value: unknown) =>
