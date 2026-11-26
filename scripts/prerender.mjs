@@ -748,6 +748,39 @@ async function main() {
   const staticSitemap = await readFile(path.join(DIST_DIR, 'sitemap.xml'), 'utf8').catch(() => '');
   const servicePaths = [...staticSitemap.matchAll(/<loc>https:\/\/miceday\.co\.kr(\/service\/[^<]*)<\/loc>/g)].map(m => m[1]);
 
+  // Service sub-category pages (/service/<group>/<category>) are SPA routes; give each
+  // its own prerendered HTML so crawlers don't see the home page's canonical.
+  const SERVICE_GROUP_NAMES = {
+    'corporate-seminar': '기업 세미나', 'recruitment-training': '채용·교육', 'exhibition-expo': '전시·박람회',
+    'it-hackathon': 'IT·해커톤', office: '사무실', 'academic-conference': '학회·컨퍼런스',
+    'public-administration': '관공서·행정', 'performance-festival': '공연·축제',
+  };
+  const SERVICE_CATEGORY_NAMES = {
+    workshop: '워크숍', 'board-meeting': '이사회', 'general-meeting': '총회',
+    'exam-room': '시험장', 'large-training': '대규모 교육', 'interview-room': '면접장',
+    'tenant-expo': '입주 박람회', 'exhibition-booth': '전시 부스',
+    'coding-contest': '코딩 대회', esports: 'e-스포츠',
+    'temp-office': '임시 사무실', 'campaign-office': '선거캠프 사무실',
+    'construction-office': '건설현장 사무실', 'modelhouse-consulting': '모델하우스 상담',
+    'poster-session': '포스터 세션 전시', 'registration-desk': '등록 데스크', 'vip-speaker': 'VIP 연사',
+    'national-audit': '국정감사', 'public-hearing': '주민설명회', 'public-agency': '공공기관',
+    artist: '아티스트', 'md-shop': 'MD샵', 'safety-storage': '안전·보관',
+  };
+  for (const servicePath of servicePaths) {
+    const [, , groupSlug, categorySlug] = servicePath.split('/');
+    const groupName = SERVICE_GROUP_NAMES[groupSlug];
+    const categoryName = SERVICE_CATEGORY_NAMES[categorySlug];
+    if (!categorySlug || !groupName || !categoryName) continue;
+    if (staticRoutes.some(entry => entry.route === servicePath)) continue;
+    staticRoutes.push({
+      route: servicePath,
+      title: `대전 ${categoryName} 행사 장비 렌탈·운영 | 행사어때`,
+      description: `대전 ${groupName} 행사의 ${categoryName}. 필요한 장비 렌탈부터 설치, 현장 운영까지 행사어때가 함께합니다.`,
+      canonical: servicePath,
+      robots: INDEX_ROBOTS,
+    });
+  }
+
   for (const route of staticRoutes) {
     const html = renderHtml(baseHtml, route);
     await writeRouteHtml(route.route, html);
